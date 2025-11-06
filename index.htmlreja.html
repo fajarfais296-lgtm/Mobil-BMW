@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Koleksi 9 BMW — Resmi</title>
+  <style>
+    :root{--bg-overlay:rgba(0,0,0,0.65);--card:#0b1220;--accent:#0ea5a3;--muted:#9aa7b2;color-scheme:dark}
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+      background:linear-gradient(var(--bg-overlay),var(--bg-overlay)), url('https://cdn.bmwblog.com/wp-content/uploads/2021/08/bmw-m1-procar-wallpaper.jpg'), url('https://www.bmw.co.id/content/dam/bmw/common/all-models/i-series/i7/2023/highlights/bmw-i7-highlights-sp-xxl.jpg');
+      background-blend-mode:darken;
+      background-size:cover, cover;
+      background-position:center, center;
+      color:#e6eef2;min-height:100vh;padding:28px;}
+    .container{max-width:1100px;margin:0 auto;background:rgba(0,0,0,0.55);backdrop-filter:blur(4px);border-radius:16px;padding:20px;}
+    h1{font-size:28px;margin:0 0 6px;display:flex;align-items:center;gap:12px}
+    img.logo{width:40px;height:40px;border-radius:50%;object-fit:cover}
+    p.lead{margin:0 0 20px;color:var(--muted)}
+    .controls{display:flex;gap:12px;align-items:center;margin-bottom:18px}
+    .search{flex:1}
+    input[type=text]{width:100%;padding:10px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:#071226;color:inherit}
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px}
+    .card{background:linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));border:1px solid rgba(255,255,255,0.1);padding:0;border-radius:12px;overflow:hidden;display:flex;flex-direction:column;backdrop-filter:blur(6px)}
+    .thumb{height:160px;background-size:cover;background-position:center}
+    .card-body{padding:12px;display:flex;flex-direction:column;gap:8px}
+    .title{font-weight:600}
+    .sub{font-size:13px;color:var(--muted)}
+    .specs{display:flex;gap:8px;flex-wrap:wrap}
+    .chip{font-size:12px;padding:6px 8px;border-radius:999px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08)}
+    .actions{display:flex;gap:8px;margin-top:8px}
+    button{cursor:pointer;padding:8px 10px;border-radius:8px;border:none;background:var(--accent);color:#022;font-weight:600}
+    .ghost{background:transparent;border:1px solid rgba(255,255,255,0.1);color:var(--muted);padding:7px 10px}
+    .modal-backdrop{position:fixed;inset:0;background:rgba(2,6,23,0.7);display:none;align-items:center;justify-content:center;padding:20px}
+    .modal{background:linear-gradient(180deg,#061026,#071428);border-radius:12px;max-width:900px;width:100%;overflow:auto;border:1px solid rgba(255,255,255,0.04)}
+    .modal .modal-inner{display:grid;grid-template-columns:1fr 360px;gap:8px}
+    .modal .modal-img{height:360px;background-size:cover;background-position:center;border-top-left-radius:12px;border-bottom-left-radius:12px}
+    .modal .modal-content{padding:18px}
+    .close{position:absolute;right:18px;top:10px;background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted);padding:6px 8px;border-radius:8px}
+    footer{margin-top:22px;color:var(--muted);font-size:13px;text-align:center}
+    @media (max-width:880px){.modal .modal-inner{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1><img class="logo" src="https://upload.wikimedia.org/wikipedia/commons/4/44/BMW.svg" alt="BMW Logo"> Koleksi 9 BMW</h1>
+      <p class="lead">Koleksi resmi 9 tipe BMW dengan gambar asli dari situs BMW Global. Klik "Lihat" untuk detail dan tautan resmi.</p>
+    </header>
+
+    <div class="controls">
+      <div class="search">
+        <input id="search" type="text" placeholder="Cari model, contoh: M3, X5..." />
+      </div>
+      <button id="reset">Reset</button>
+    </div>
+
+    <main>
+      <div id="grid" class="grid"></div>
+    </main>
+
+    <footer>Data dan gambar diambil dari <a href="https://www.bmw.com" target="_blank" style="color:var(--accent)">BMW.com</a></footer>
+  </div>
+
+  <div id="modal" class="modal-backdrop" role="dialog" aria-hidden="true">
+    <div class="modal" role="document">
+      <button id="modalClose" class="close">Tutup</button>
+      <div class="modal-inner">
+        <div id="modalImg" class="modal-img"></div>
+        <div class="modal-content">
+          <h2 id="modalTitle">Model</h2>
+          <p id="modalIntro" class="sub"></p>
+          <div style="margin-top:12px">
+            <div id="modalSpecs" class="specs"></div>
+          </div>
+          <div style="margin-top:14px" id="modalDesc"></div>
+          <div style="margin-top:18px;display:flex;gap:8px">
+            <button id="learnMore">Situs Resmi</button>
+            <button id="closeGhost" class="ghost">Tutup</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const models=[
+      {id:1,name:'BMW 3 Series',slug:'3-series',tag:'Sedan kompak',img:'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBxITEhUSExMWFRUXFRcXFRcVGBgVFxcVFRcWFhUVFxYYHSggGBolGxUVITEhJSkrLi4uFx8zODMtNygtLisBCgoKDg0OGBAQFy0dHR0rLS0tLS0rLS0tLS0rLS0tLS0rLS0tLS0tLTctKy03LS0rLSstNy0tKzc3Ky0rLTIyN//AABEIAKgBLQMBIgACEQEDEQH/xAAbAAACAwEBAQAAAAAAAAAAAAAEBgIDBQABB//EAFAQAAEDAgMDBwgECwYDCQEAAAEAAgMEEQUSITFBUQYTImFxgZEUMkJSobHB0SNTYpIHFTNDcoKTwuHw8RZEY3Oy0jSioyRFVFWDs8PT4xf/xAAZAQEBAQEBAQAAAAAAAAAAAAAAAQIDBAX/xAAlEQEBAAICAgEDBQEAAAAAAAAAAQIREjEDIUFRcYEiMmHB0QT/2gAMAwEAAhEDEQA/APmpCByjnTcX0R5CFjH0p7FzjawwN9UeAVopWeq3wC4Ihioo8jZ6jfBA1kTRK0NAAtuWvZZtd+Wb2IlRdThQpqEPkLTe1r6I/KqYZ2xy3cbAtUlVRW0LGbGvN9hvpdB1FMW67luVMrXluWztUdFTABwLdPFXkmizR0RkBIOoV2G4fzjnNJII4WWvgkAaZCOKtwuP6WQ2UuRpjU2F3mMTnOA4i1/crcRwfmy0Nc45uIHwWxTM/wC0HsXconFga/bY7E3V1Cq6Eh5Ze9lPycqUU5dKX7Cb7FfzzvWPiV0mNrFsgRsLrEjdtRGHU0kps0gdZv8ABWMqXjY4hb/Jxlw48dttPcpnLjFxu6xHUczX5A/Xqc8K6NlWHmMSG4/xH2Wy2K9T2BENj+nf2D4rltv2yebrw5recuXbOmT72o1tLifrD7zfixF19dzUrHFo6IO17Wg+Jv7F6/lj1QjtlJ9zFO/hfydMNa8RMz+dYZu1diFhG4niPevcMlzxsfp0gDps7lOutkdv1CvwTthYg/6WX/K39iW6g6Q9hTRXw/Sy7vou0pXqXAcyDtINki1mQyljw4NLiHaNG09QTAMeqd9DUd0bz+6l7nCw577Dfj7Ea7ltOdG1Dh+jEw+9yuWO0mWh9PypL382IXh/B9m27b6jwVtbikgabxHucClvAZnSVedzi4m93EAE9oGiacWb0D2LnljJZGplbC9hLswcdnSR4CycILwHWAIvvNvgjxJJ6o+9/Bas9mPS5zUXhEf00f6SznSv9T2hF4PV2nizNIu620cD1rOqu31CeZzLF17XA0HHvQmIt6Mdyb84Dpp7AtZzhu9yzKpuZsbrWPOeltCKVcaZ9HNcX+lb7wlmujtK8AEDT3BM+MAlk/S82Zt7Ag3uPFLuIOtK69t23sHWt4sZMYhCxRkzdyNIWfUVJjkzAA6b1qMVpCnPUpxwkcFljHHeo3xKkMcd6g8StaTbW5orIrm2mapfj0+oPH+CHdWc5K02t33TRtq2WVi46Q7FshqycbGo7FnHtb0z45SCCDsTXhdUJGdY2pRCIpKp0ZJaRr3rWU2zKa8JGj+0r3CvPk7UtNq5gNC4A66DTxsqHPcdpI7brPFdmsTsZOXOcAMu9AcosRjkbZj81jroQPFYjYxvePA/JWfRgEF56rC+vZokhtRReciV5g0AfM1tzYnbb4Js/szHrdzx3XXWZzHtm42lRM/Jk9E/zwVsXJiI7XP8PldTp2xU73Rl/YDe/is+TOZTUXHGyrKNt6h3crGE8/JwFvihoax7JHPYxpvsLnAezarI6qRzy4CL7WQOce87FxdFPKMMzxc4Blub3VEc1ENjL9gJ+KhyjfJeJ7tG5toGX23Rxmit57vvu+aB3w7KY2Fo0yiw4K2siJa4E6XG8eChhrG5GED0RxPvRVS3oG3Ee9JDfsv4jIGzTC9votvDT2pdqSMsAuCcp/qmjFiOekuB+SSzUADmjbUtKsWs/DXDnmXGmfX2r6KZIDo3ID+oPivnmGRZp2NuWkvtcbRt2XT8cDkYC41U7uABYD45QmSQgxttibx1rexdnQPYl+mjLcScCXE32vIc7vIKZ8Wb0D2LGfcax6pQwMaP/SWk5qBwPY/9JaTwrl2uPQd4VmFQtdURX3P+BUXbFdg4+nj/AEvmivrvNga7lmVjbsjsfzu4IyWDZfPrtsfhdASNAjiYAdJABcbLcVmpCti8eVtRp50wudb3uO4JcxCMCV/R22vv3DimbG49JzuErdN20apaqi0yOLRpcbOwLpizkyy1YuL+f3LfIWFjXn9y1j251nlcuXLoyuhLToQFKkH0g7UOr6H8o3tUqw05VjY+NWrfyrD5RjzVzx7avTHUV11y6sDaOrfo3McvC6vM78rjmuQdOpZsb7G6vE4s4cVmxdrYat4Ny4ntJt7EZiJL4muOg2BxB18FkEDitmqqWyU7GCwcN1wPaUsIEwIETty2JvptA9yfvInm5yN122nlH9Eg4OCydtxfqaQ7wIKfoXNGvN1A/nqKzl21j0uhoXaXY7TZaokPvIQ9VBTveQ+JkknpCzXOA67lWMmYL28pbfb9Gf3WpZqcX5mrc8BxDgAc7SHW42KzpWlN+LGmxZHfeAwm3VoFWJMMJDRHtNhZrh8Vg1lI6TPKwXbfdt1QWHx/SsB9YLWv5LZ9DTyhwiBjoWsblD3a6u2d5Un4NTDQvt/6hv8A6ldynmaZKe4OW+txfZ1BRbXU5uMoGtvMv42bosW1r0+g4VE0RRhuzKLImob0T3e9U4YQYmZSCMo2diIqB0Cr8M/LJr2/Sy/5KVKlvRh7Cm2vP0sv+SlWqHRh7Cka+C/UB2uQkOvoQbG/Udys/F+K5b55iAL/AJe+nHV6siLA8GTMWB3Sy7bdxT9TspjBI6BgALDc65tm8n5pldJI+Ycmpnuq2l7i528uNz4p8xMdA9iQOTX/ABbf0j719DxJnQPYs+T90XDqkrBqdrjJcelxPzWiaNvX953zQ2AjWT9JazmplfbWM9M19E37X3nfNX4JAG1ERu7zxvcfZdXOYrcHYefj01zBTa6fVHP1HC/9EDXmwYTs50bjfwCPkivbbtGxZ+LtzMawm30g14ajerWIV8ZALKi97GZultNo70s1kbWyPAsBcadwTPiMdoZhe9pWjXW+oSzXxEyv7uHALUKzyxL+OjpjsTMWpc5RDpjsWse2Kyw0lECgk4e1vzVdOLlaofIAOnGeF3LbLKdTuBsR7VKiH0je1TqJXXuS0nq1UKM3kb2peg5ZVh8ph5qYg1YPKlujFyx7by6LzWEmwFz1aqRid6p8CmHk2+DYNJPtb/0SmAdq7OT56GHgfBdlX0VoVjWobfNtFxI4r6YI9gtcnYALk9gGpWhDgxIvIWxt33Ac/uaNB3m/Ug+XYKQJmk6ahfW6XBXPs9jDYjzy5zW37Cde5Rw+ioaXpRxDnNueTpydovo39UBVVnKgk+d8/BZslbl0JqOTbi1we+MZhufL7jol+v5LQXBfKxxAsNXfNDVuMSyOytcSTsABJ8AoytDReZ1j6jek7vOwe1WYzsuVs0kKdkYLI3Cx3NDtfYg3QRt25QeoC48NitZzkgtE0MZvOwd7t/dfsRNPh1Oz8q4yHqOVvsNz49y0yzX10YPpOO6+nhdWsq5PQgeevK93uCZKfEYGaRMYzsaAT3jaoT4vdTYwXYlVNF+be0DXzJAAqvx/U+u7XgX/ADRmIYoxzHAO1ynjwQkb2AM7LHw/ggg7H6jU536ixOpuOFyChnYvJ0QZB0dgIbp7AqahxBIGy5t2XQu/XVNRd1a+Vzr+a6/b/FM3JjlDDBBJDKx4c69nNAc2xGgOua977kvR08LvRyntPvUzhR9B57HahS4yktink7fyxvAuNt2/rX0bEB0D2L5u6N7dHC526a6cf5stKkxuVoy5yRwfd1v1j0h36LGfj3dxrHPSWDyOa+WzC7pbsvxK1TUu+rd/y/NZeEThr3l/RzG4O7x3d6YWxg63XPP1fbrh7jPdM76t3s+aIwSU+UR9Bw6XBEOi60RhMQE8Zv6SztrT6LNe2m24696AqYrNjH+IP5171pEXQFVcCPZfnBtWq54lTFpOhOOM7dvaEs1uYyv1tqPcOKZcaADai+v07dTcgajYliqJMsma97j3DYtYrkiWpZ5Tt6bexNpYlblY2z29iuPbnemRGCEbFI3TM62vqtP/AMfxVcbdAvci2yHqxd5tqOK9pWgSMsSdRfSw7ldlUWS55WmwvcXtfXrIVDyGJf5Wt0Z2piEzLbfDX3LF5QwmUNDAdDrcEe8LnjLtu2aKIcou8VsR4A87b9wWrFgdPlAdG4EAXJkIDj1i2g6guunMr0UD5HhkbHPcdjWgknuCeMH/AAfvsH1T+bG3m2EF/wCs7Y3sF+1b3Jtr4W5IoWhhO2Njs9vtPN8+vFX4gyU+dKxg/wARzGH2oKXVdPStyQsDOJGrj2uOp7ysOrx8npONuAIJA/irp8Na51zURdgfn149FqzqvkyyS9qkXv6khH+kJoZtVygcTobX8FqUWGzStzykxxja52hPYPn4LRwDk7BCQ4l0j+JZYA9QLtB7esIXlTUOD8mck5QekA1rQTo1rb23f1TRtTU17IrMhGXNpmPnv678OvZ2qNJTX6Thn6vR7ydvZs6kvVLspzXzOJve4ue+6aqflBSxsbmgbLp6ReAPsmxGqoEr8Rk2W03AW2DsWNLXuK0sa5TwSPvDSNiG4Rut3m7SfasaWJ0hL7sbmN7F+o7d91BOKudmGu9GvrCQR1FZ7aA/WR+Lvg1ECnt+cZ/1D+4gGLyVJ9Ybnq/oiWQtuCZG7dzZP9iHdSN16e3gx/G+8BBoUDs0dz1+9cymJUaGWNjQ0l7rE7GED3o5mJxD0X/d/igpbSFH08LgFBmNQj83J4D5q9vKKIfmZD935oIPpjzke64ePCx+CIfgoftGu4jQjsQ0/KEF8bm07+gXGxI1zNLbdW2/cvKvHqiUZGR8006Fw6TrexBlys5uR0eYODSBcde7tHVwRdNUvZ5jrD1Tq3w3d1lTFgjjskO0bWHeQNxK0YeT8pGjwf1Xj4K632b0LpcWadH9A8Tq3727vW1hIvPHr6QWHHyeqPVae+3sNlKHCqmFwfEXxlpuBl5xl/0dbd1lyvi+jpPJ9X2AhAVrriMj6wdRSCfwh1MWkzad1uAmhd4FrhfwTbhGNR1dPBOwEZ3+adS0tJDhffqNqzljYY1iY9F0Z9NefbqbHeEqYtMWSuHnHTUnqHAJwxw3bON4mbsOu0JSrQGyvsbXIPfYJi1kIc5vrDxCVeV/nMIIOm5DCNC4i3zVrGe2L0iypaABqtahw1zxmddjesdI9g3d6Z/we8nqB9N5TUZzI572tIc1rY8mvRBOryNdQdNgC16/AqAbaiob+qD7mLpqMFKOlgZ6OY8XG/s2I6mqohoGgdgCOj5P0UhcIpayUtsXZYg0C97dJ7A22hVEvJ6G9mktP+NU099PsseT7FRoU00TtsjG9xefDogeJVtTX0EQu50kh9UFkY/5Wl3tWPFhUEZu+aA2OoDppDoCSCObA3cUZUVdMBbKABf8jTxRk9r3vefBqbGXU8ork8zTQsHrS55z/wBRxHsVTcWqbf8AEFo4RMZEB3xtBt3qqflNYmOlphmILTJK8SuF9pbkaxrT1m6pp2y3DnvLng3Au4tB7HE39yAwCSTU8/KD63OPB8bomHDZvQpX/cI94CqfVVjjrUz90jwPAGyughcdZJn24vkPvcUQVHhNYdkRb90fFTOD1DfPcW9jXO/0gqVO6jbtmiv1yN+a1YMUpQNJGdxv7lRhlkTfPnmHZDU+/Ih6iWhJGeWVwAPnQynXSw6TesptZjdP9YPb8lzsXiLgec2A+tvLfkoPnWN0tDI28Ek3ODYOYflcOB3jtWXPQPeA0Nlyjc2GQ3O925fWHYxH65PihzicW3X+e9FLlD5G1jWmgr3uAALhBYE21IBebDqRzXQnzcLrT2sa34rXdjrOvxVbsfbw9qIzsnq4TP8ArSRt94UDDNuwg99VEP3Ue7lEOAQNdjheAA4CxvsJBtfouAIJb1AjYgCbUOMnNChgD/VNbAXfdGqNOH1JH/AwN1G2oB3jg1ZrcSIJyxULBba2kaX3tqbl2m/W6I/tA8aktvp5kbIxtvsaNe+6A/8AFNUf7rSDtmefc1ccDqj+aoh+vMf3UC7lLJxVL+UcvrFUao5N1B2+Rj9ufkvDyXn9elH6k5/eWHJj8x9N3iUNJi8p9N33j80G1WYJPH+chc61wyKGeR5Gg0Y11ztGuxRwvC6+QEmJ8XDnKSfXwcfalx1W8uDszrjfmcDa97Gx1HUq5ZHOcXOe83NyMxDewNGgHUFA3SUtQ3ompgBB1+ieCC07DeTiLWXrKyobp5VBv/MuO3X6xJr3gbwFAVDfWHiEDi/F6lpB8phO3ZC7Z+06gharlTMOiZGn7UbAD2WcXBK0spQj5ijWN1dmGtn50jPKTfflYNN1tBdO/wCDSW0UlOH52xuEjLgNLc5OYdYvr2uK+VQVZGgJA9ngdF9G/BbTxyCdzzmcMoyiwbkdqHWG+7XDgvPcc/ruPpZef/mz8dk8fHL8/wC/0Ycao9XO06RuQXNDbjfax1ShW04DzrHqb6veT704YrQw66e8pPrqSMO0Du5qseOljmhxHiFXLQtfYF2uwAWJJK0TgJ+sb4D/AHIaow18BEzHtc9rmhjRYHM5waNb6alan3Yv2E0lX5Ix9NITke18jAQCRM9vNhwcNgsCDfhs3quu5VzSHWKPta8+OqPPKF4YHVVHTyZvMc5jH5gAT58dr7Dv60XS4nA27o6Snicd7WknuzONl0jmVauaqnABa8RjY0ZshO3MfWPWjcOp5hbLG2/UwvJ2bQ7MN3DetmXEXPOpuSi4H5fPqII+p0rS77rSSrpAtJhtY4g/Rxi+pdHDfXQmwaTexKtxWjfqyWoMjdOi1ojBtcC4Haj6fE6O9nVOc/Za4Dxts61m4vWQZjlPtugBZTNaLMAaOG5XxkN1P8EH5azddC4hW3Fhs3qi2vxQnRpyjj8liS18YN7F7uJ19pVMcb53ZWeaNp3AbLnv0A3rVpMNgByNY+ol3tYLhv6TvNH86qbVmHEx6g8f4L2OqYTpdp8PaFvScnqotLhQtLW+cBkzgdjTe/Yl6emab5AWOHnRuvcHqvr3FQacNW4bTfrRjas327kt08x2eCsMxTYYjWdaiaz7XtWHG1x2BEspDvKuxomsHrKJrG8UGKUcV75O3imwSaxvFQNY3rVPMtXmRqbFprAoOqxwUCG8FBxbwUFpq+pR8r6lUZBwUHSBBcak8AoGpKpdKq3TILnVRXnlJI2oJ8l0XhWHuqH5AQxjRmlkd5rGDa48TuA3khALJML8V62pG9qYTRssPJ4GiK9hNUOy84RoTmOg/RYhsQwiRrc7mxObmLCYH5y14Fy0sOt7IAoXMI6JseCrlQkjMpDmm43K5s17Ei/Ugk1hOgF02/g4dLFWsAOUSNexwJ0IDS8d92D2pcFa62lm9g+aYPwdOz17S4k5Y5HanfYM/fUvSzt9SrpOLmeKX6mojvq5vv8Aii+U7heMNvbW9vispj2Da7xcfmuWnbYD+x0f1rvAKuq5FtLehMWvBBaSAQCCCNB2Jh/EB3zO8AvfxAfrn+AT9THp8tnjqHflHdFrnCzmiMAgFultLXNr7Fc8zNsBG9wtqWhzvcLHxTzU8kJBfm5gQTctlaHNJ2X2GxtvABWDWciZxc800njG4H/3SV2256L09Q4aG46iCD4FToall7SMa5p0OZoNvtN3gjq6xvRT8HfH0Zo5mA2s8xnK0nTUho042ujKPk9SHWTEadvU03PibWQB1NDSQuJJAcWPDRezA5zSGPuekbOIOgt1rPllvrcHrGw200TbXwURibE2rjIbsdzrsw6mta7Lb9U70o4jzTTljkdJqbudv4AX1I6ygj5RZCVdQbdqsY5m8HuUJHM5xhANgQTfqIKBigoiAykjOV1s879+bKS/X7LeiBx7So19S5pNNE3mmgtdCWE3e5u6UjznE66925UYc8PbUPe177s1EZ6fTkYCRcH3LQw9zIjse54sGMmy3tvPRJuRrtttQaUuKyU1POI3fTVc5LRvAIAJuNlul2ICugFZA+ZgJlp2tGcjSZrBaS/FwOvf2r2nq3tzNa0WddzwcxdZutgL9ezfcobk3XO8ofzEZc/m3tyvLgObJAPR2C2mnUgV+cs7MN/uKtuAUPILacD7iiWVZFhpsG4cEFjayyn5a7gVHnyfSHcB8l3Ofb/nwQS8ofwK7PJwUecHre9e5xx9pQSDZOCkKeQ7wq844+9dzg4j2oLhRP8AWCkKA73IcyDqXhc3gPBAYMPbvevDSxDa8eKD5xv8gLwyj+f6oCnRwjie4/FUSGPczxKpMnX/AD4qtz0HSvG5oCMwqWzObJsxxMk1tpbGCQ3r0DtPtLNlK0cDmyl7szmkRuIcy2YcSLkbgUGjVukqJAA4uY9lmjY1jWC7XNHo2tYjjxuFeZHRPjex14w90z3tv5ziLgfbIDWgdqFppi9rjq3UOa5waDIdBYNaBm3a6+5VSzyNaSM2tujoLXFr667txQEcq6Nt2ztGXnr52gWDZNSMo4Ee5LkZWtXzTeTxNcG83mJYRfNcXBBBOzRbsH4P3EBxqAAQCRzZuLi5HnJsKGYpi5FSZZHSHQBhbe20uLTYW/R9oW/T8haYefJI/qu1o9gv7Vu0+GU7GhjY2ho2b+8k6krOV9NT1QMtYx3nXPdf4qp1VCNLDvsPYtYUUH1bV4cOgP5tqxxb5GQL1c0KVlrbLwrwvaNpHioywkrMrKBxCDQfXQt2ysHa4D4pdxjDsJnJdI+EP3uZKGHvsbHvCx8XwV5voUqVuCvG4qsu5R4VFA76GaOaM7CyRpe3qey/tGmm5YnPBXTUbhuQzoitI95xaVbhIjhbN5TTvcSLwxvzyNBvqbDKbWF7E7Vk5V5ZBt4BVNaS1znNDmuY5zTZzQ7Y4dht3I1rRTOu27nhpL3vHoka9eulgOO1LLXkahb9DyhGQRTMEjBsBuLDgHDUDq1QHGXM92RmQBjXjKbu/J2eL9ZN+5F4Y59PTPmkkeHSNtExwFw0jUl51I/hxWbLyghaS+OOzrWuXOcABbQNNgNgWNiOKSTuzPP9OAG4INrBMPw6WF5qavmJecAYA1zwIxYuLmgbT0gNdNCtd2E4B/5hP3N//FIQZdTEBUDhBhWCAgvxKZ43hsDmE/rZTbwRzabk2P7xUnuk+EaQvJivRTJoPwj5NfWVB/a/7V7bk161Qf2vySB5MvfJk0H7Pya4VB/a/Ne8/wAmvq5z3zf7kgeSr3yRNB+8s5ND8xOe+b/7ENidVyefE5kUc8Lz5sjQ95aetr5CHDiPaEk+SFeeSlBVMAHENdmF9DbLccbHYo5lf5KV4aY8Cqhi5KV2GQAvq45aiQiwZkbzbB3uBc7r0t7Vty8pcCP/AHc/uaB7pEgGA8D4LzmHcD4FTSmHlNiOGSxgUlLJBKHA3Ju0t1BaembbQdm5YdBUljg4GxHuOhH88VV5O/1XeBXCkk3Mf913yVG/9K5wla7Nc6Eeg0auL7+lut2kKinpZJGtDjoCb5jazbkg9drrPhZUN82OQdjXC/bopy+VO2sk+65ARiVVGJYwMzo2EEi+p1ubbhe25Mp5fR/Uv8WpL/F85/NP+6V7+LJ/qn+CBx/t1H9U/wAWr0ctmfVP8Qk4YVP9U7wUhhVR9U72fNTS7OI5Zx/Vv8QpjllH6j/Yk9uE1H1Z8R81aMIqPU9o+aG33mNWALPhqETzy5bdeIkBe2VAlCubIOKbTi9LQdoVMlBE7axp7kQCOpcQmzTLm5NUr9sQ7iQgZOQdE70HdzimIKTJFeRxKx/BvQn0ZPvlR/8A5lQerL+0Kbs6k2XinJOBRH4L8P8AVl/aH5KQ/Bdh3qy/tD8k4NlB3qReE5HEnD8F2G8Jf2h+Stb+DLDR+bee2V/wKbcw4rso4pypxhZj/B1ho/ME9skh/eRLOQ+HD+7N7y4/FbRB3FdmcNuqnKrxjJHJCgH91j8D81MclaAf3WLvatIyHgo86nJeIJvJqh/8LD9wKwcnqMf3aH7jfkrzN2Lznrbk5HBAYJSDZTxfcb8lY3C6fdDF9xvyXnlIXGo605HFYKCEfmo/uN+SmKSL6tn3W/JUCo4FSEpTkcBAgZ6jfuhRfTMPoN8AqOeI/iu8p7E5JxUVGExO9EeCzJuT8PBa76g/yUJNVK8k4sabA4ghJMPa3YStOoqQs2pqArtNBXi29CSyL2eccUFLIqmnskiNwXAqmrLhAzPltmJIaBfYLuNr9SGwfDJaqZsEQu5207mtG17uofw3r6NQcoqaiMlLCHuip4nGSRkbpOcqTtLnMBDQMpFzpu2NVHzyuwWoigbUvZaJzi1rg4HUZhsBuB0Tqjo+RdcZOaEQz82JLZ2eY4loJN9twdOpN8WL00lJBhkkc93UrTfmJS7nWZTdrMt3i4ccw06J11WgeUbGVFZU83KA1tNCM0T25bEvcHZh0T9ONDt06ldI+aYPyeqql8jIY8xjNn3c1oabkWuTtu0+CypCQSDtBIO/UaHVfaqbEIaZ9S2GOQEMlq5yW2IfISY732CzH+AXwpsimg+RTK3njfaV6uXF6FsVR3+z3K3yq+7vXi5BIVBVzakjS9vYvFyC1tRf+qm2fh8Fy5BLnz1e5dzi5cg7nbqXYfAr1cghz3ArufPELlyD1lQeKkai/pA9ui5cgk2oP9FIVAK5cg8MrV4COPxXq5BF7OzvUHMXLkHFh42UdRv8bH4LlyD0SH+ii6ZcuQVOm6h4a+xCy1A109q8XIjOqJh1hZFZXMabOuOvWy5ctxms2oqGHY/3hBvk61y5VlfQY3U04eIJTHnFnlobcjXTMRcbTsIQ9Hi9RFHLFHLljmGWVoA6bbEWJIJ2OOw71y5VF03KKrfNHUPmcZYgBG+zbtAvYAAWt0jtG9SqeU1U9kkb5nubK8PlGVozvaGgOJAvpkZs9ULlyqPJOVdUTMTM8mdobNcN6bWtLQDpoACRpZZYqupcuQf/2Q=='},
+      {id:2,name:'BMW 5 Series',slug:'5-series',tag:'Executive sedan',img:'https://www.bmw.co.id/content/dam/bmw/common/all-models/5-series/sedan/2024/highlights/bmw-5-series-sedan-highlights-sp-xxl.jpg',intro:'Executive sedan yang nyaman dan canggih.',specs:['2.0L / 3.0L','200-335 hp','Luxury interior'],desc:'BMW 5 Series menghadirkan kenyamanan, teknologi, dan performa kelas atas.'},
+      {id:3,name:'BMW 7 Series',slug:'7-series',tag:'Flagship sedan',img:'https://www.bmw.co.id/content/dam/bmw/common/all-models/7-series/sedan/2023/highlights/bmw-7-series-sedan-highlights-sp-xxl.jpg',intro:'Model flagship BMW dengan kemewahan luar biasa.',specs:['V8/V12 opsi','Fitur mewah','Driver assistance'],desc:'Kabin super mewah dengan kenyamanan maksimal.'},
+      {id:4,name:'BMW X1',slug:'x1',tag:'Crossover kecil',img:'https://www.bmw.co.id/content/dam/bmw/common/all-models/x-series/x1/2023/highlights/bmw-x1-highlights-sp-xxl.jpg',intro:'Compact crossover yang efisien.',specs:['1.5-2.0L','Praktis','Economical'],desc:'Posisi berkendara tinggi dan efisien untuk keluarga kecil.'},
+      {id:5,name:'BMW X3',slug:'x3',tag:'Crossover menengah',img:'https://www.bmw.co.id/content/dam/bmw/common/all-models/x-series/x3/2022/highlights/bmw-x3-highlights-sp-xxl.jpg',intro:'SUV menengah dengan performa dan ruang seimbang.',specs:['2.0-3.0L','Versatile','Good cargo'],desc:'SUV ideal bagi keluarga modern dengan gaya sporty.'},
+      {id:6,name:'BMW X5',slug:'x5',tag:'SUV besar',img:'https://www.bmw.co.id/content/dam/bmw/common/all-models/x-series/x5/2023/highlights/bmw-x5-highlights-sp-xxl.jpg',intro:'SUV besar dengan interior luas.',specs:['3.0L inline-6','Optional V8','7-seater opsi'],desc:'Nyaman untuk keluarga besar dan perjalanan jauh.'},
+      {id:7,name:'BMW Z4',slug:'z4',tag:'Roadster',img:'https://www.bmw.co.id/content/dam/bmw/common/all-models/z-series/z4/2023/highlights/bmw-z4-highlights-sp-xxl.jpg',intro:'Roadster dua-seater dengan sensasi berkendara terbuka.',specs:['2.0L / 3.0L','Convertible','Driver-focused'],desc:'Mengutamakan kebebasan berkendara dan desain sporty.'},
+      {id:8,name:'BMW i4',slug:'i4',tag:'EV sedan',img:'https://www.bmw.co.id/content/dam/bmw/common/all-models/i-series/i4/2023/highlights/bmw-i4-highlights-sp-xxl.jpg',intro:'Sedan listrik dengan tenaga instan.',specs:['EV','0-100 km/h cepat','Regenerative braking'],desc:'Sedan listrik BMW dengan performa tinggi dan desain aerodinamis.'},
+      {id:9,name:'BMW M3',slug:'m3',tag:'High-performance',img:'https://www.bmw.co.id/content/dam/bmw/common/all-models/m-series/m3-sedan/2023/highlights/bmw-m3-sedan-highlights-sp-xxl.jpg',intro:'Ikon performa BMW.',specs:['3.0L twin-turbo','480+ hp','Track-capable'],desc:'BMW M3 dikenal dengan kecepatan luar biasa dan handling presisi.'}
+    ];
+
+    const grid=document.getElementById('grid');
+    const search=document.getElementById('search');
+    const reset=document.getElementById('reset');
+
+    function render(list){
+      grid.innerHTML='';
+      list.forEach(m=>{
+        const card=document.createElement('article');
+        card.className='card';
+        card.innerHTML=`<div class='thumb' style='background-image:url(${m.img})'></div><div class='card-body'><div><div class='title'>${m.name}</div><div class='sub'>${m.tag}</div></div><div class='specs'>${m.specs.map(s=>`<span class='chip'>${s}</span>`).join('')}</div><div style='flex:1'></div><div class='actions'><button onclick='openModal(${m.id})'>Lihat</button><button class='ghost' onclick='openExternal("${m.slug}")'>Situs</button></div></div>`;
+        grid.appendChild(card);
+      })
+    }
+
+    function openExternal(slug){window.open(`https://www.bmw.co.id/${slug}`,'_blank');}
+
+    function openModal(id){
+      const m=models.find(x=>x.id===id);
+      if(!m)return;
+      document.getElementById('modalTitle').textContent=m.name;
+      document.getElementById('modalIntro').textContent=m.intro;
+      document.getElementById('modalImg').style.backgroundImage=`url('${m.img}')`;
+      const specs=document.getElementById('modalSpecs');specs.innerHTML='';
+      m.specs.forEach(s=>{const sp=document.createElement('span');sp.className='chip';sp.textContent=s;specs.appendChild(sp)});
+      document.getElementById('modalDesc').innerHTML='<p style="margin:0;color:var(--muted)">'+m.desc+'</p>';
+      document.getElementById('modal').style.display='flex';
+      document.body.style.overflow='hidden';
+      document.getElementById('learnMore').onclick=()=>openExternal(m.slug);
+      document.getElementById('closeGhost').onclick=closeModal;
+    }
+
+    function closeModal(){document.getElementById('modal').style.display='none';document.body.style.overflow='auto';}
+
+    document.getElementById('modalClose').addEventListener('click',closeModal);
+    document.getElementById('modal').addEventListener('click',e=>{if(e.target.id==='modal')closeModal()});
+    search.addEventListener('input',()=>{const q=search.value.trim().toLowerCase();if(!q){render(models);return;}const filtered=models.filter(m=>(m.name+' '+m.tag+' '+m.specs.join(' ')).toLowerCase().includes(q));render(filtered)});
+    reset.addEventListener('click',()=>{search.value='';render(models)});
+    render(models);
+  </script>
+</body>
+</html>
